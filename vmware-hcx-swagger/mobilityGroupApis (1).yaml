@@ -1,0 +1,1048 @@
+openapi: 3.0.0
+info:
+  description: Mobility Groups APIs.
+  version: '1.0'
+  title: Mobility APIs.
+  contact:
+    name: Broadcom, Inc.
+  license:
+    name: Copyright © 2005-2024 Broadcom. All Rights Reserved. The term “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.
+servers:
+  - url: https://{server}/hybridity/api/v2
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /mobility-groups/query:
+    post:
+      tags:
+        - Mobility groups V2
+      operationId: fetch mobility groups top level summary
+      summary: fetch mobility groups top level summary
+      description: fetch mobility groups top level summary
+      requestBody:
+        description: Mobility Group Query Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupsDefaultRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsDefaultResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /mobility-groups/{mobilityGroupId}/summary:
+    get:
+      tags:
+        - Mobility groups V2
+      operationId: fetch mobility group detail summary
+      summary: fetch detailed summary for a mobility group
+      description: fetch detailed summary for a mobility group
+      parameters:
+        - name: mobilityGroupId
+          in: path
+          description: Mobility Group ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupDetailSummaryResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /mobility-groups/{mobilityGroupId}/config:
+    get:
+      tags:
+        - Mobility groups V2
+      operationId: fetch mobility group config
+      summary: fetch config of a mobility group
+      description: fetch config of a mobility group
+      parameters:
+        - name: mobilityGroupId
+          in: path
+          description: Mobility Group ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupConfigResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /mobility-groups/{mobilityGroupId}/migrations/query:
+    post:
+      tags:
+        - Mobility groups V2
+      operationId: fetch mobility groups migrations summary
+      summary: fetch mobility groups migrations summary
+      description: fetch mobility groups migrations summary
+      parameters:
+        - name: mobilityGroupId
+          in: path
+          description: Mobility Group ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Mobility Group migrations Query Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupMigrationsSummaryRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupMigrationsSummaryResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /mobility-groups/{mobilityGroupId}/migrations/{migrationId}:
+    get:
+      tags:
+        - Mobility groups V2
+      operationId: fetch migration details
+      summary: fetch migration details
+      description: fetch migration details
+      parameters:
+        - name: mobilityGroupId
+          in: path
+          description: Mobility Group ID
+          required: true
+          schema:
+            type: string
+        - name: migrationId
+          in: path
+          description: Migration ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupMigrationDetailsResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /mobility-groups/{mobilityGroupId}/retry:
+    post:
+      tags:
+        - Mobility groups V2
+      operationId: perform retry of migrations in a mobility group
+      summary: perform retry of migrations in a mobility group
+      description: perform retry of failed, cancelled migrations of a mobility group.
+      parameters:
+        - name: mobilityGroupId
+          in: path
+          description: Mobility Group ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: Mobility Group migrations Retry Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupMigrationsRetryRequest'
+      responses:
+        '201':
+          description: Created. Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupMigrationsRetryResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+components:
+  schemas:
+    hcxSiteInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        infraManagerId:
+          type: string
+        infraManagerType:
+          type: string
+        infraManagerName:
+          type: string
+        siteType:
+          type: string
+
+    mobilityGroupsDefaultCountSummary:
+      type: object
+      properties:
+        totalVms:
+          type: integer
+        totalVmsDraft:
+          type: integer
+        totalVmsQueued:
+          type: integer
+        totalVmsWarning:
+          type: integer
+        totalVmsCancelled:
+          type: integer
+        totalVmsError:
+          type: integer
+        totalVmsInTransfer:
+          type: integer
+        totalVmsInSwitchover:
+          type: integer
+        totalVmsWaitingSwitchover:
+          type: integer
+        totalVmsCompleted:
+          type: integer
+
+    mobilityGroupsDefaultResourceSummary:
+      type: object
+      properties:
+        totalVms:
+          type: integer
+        totalCpus:
+          type: integer
+        totalMem:
+          type: integer
+          format: int64
+        totalDisk:
+          type: integer
+          format: int64
+
+    mobilityGroupsDefaultRequest:
+      type: object
+      properties:
+        pageParameters:
+          $ref: '#/components/schemas/paginationRequest'
+          description: page parameters required to fetch page
+        filter:
+          type: object
+          properties:
+            pairingId:
+              type: string
+            mobilityGroupName:
+              type: string
+            sourceId:
+              type: array
+              items:
+                type: string
+            destinationId:
+              type: array
+              items:
+                type: string
+            mobilityGroupId:
+              type: array
+              items:
+                type: string
+            migrationWaveId:
+              type: array
+              items:
+                type: string
+
+    mobilityGroupsDefaultResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              info:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  migrationWaveId:
+                    type: string
+                  migrationWaveName:
+                    type: string
+                  name:
+                    type: string
+                  source:
+                    $ref: '#/components/schemas/hcxSiteInfo'
+                  destination:
+                    $ref: '#/components/schemas/hcxSiteInfo'
+                  pairingId:
+                    type: string
+                  servicemeshId:
+                    type: string
+                  createdTimestamp:
+                    type: string
+                  lastUpdatedTimestamp:
+                    type: string
+                  migrationStartTimestamp:
+                    type: string
+                  tags:
+                    type: array
+                    description: Add 'V2T-Migration' to trigger an NSX-V to NSX-T migration coordinator based native vMotion.
+                    items:
+                      type: string
+              summary:
+                type: object
+                properties:
+                  state:
+                    type: string
+                  countSummary:
+                    $ref: '#/components/schemas/mobilityGroupsDefaultCountSummary'
+                  resourceSummary:
+                    $ref: '#/components/schemas/mobilityGroupsDefaultResourceSummary'
+        pageParameters:
+          $ref: '#/components/schemas/paginationResponse'
+        errors:
+          $ref: '#/components/schemas/errors'
+
+    mobilityGroupDetailSummaryResponse:
+      type: object
+      properties:
+        item:
+          type: object
+          properties:
+            info:
+              type: object
+              properties:
+                id:
+                  type: string
+                name:
+                  type: string
+                migrationWaveId:
+                  type: string
+                migrationWaveName:
+                  type: string
+                source:
+                  $ref: '#/components/schemas/hcxSiteInfo'
+                destination:
+                  $ref: '#/components/schemas/hcxSiteInfo'
+                pairingId:
+                  type: string
+                servicemeshId:
+                  type: string
+                createdTimestamp:
+                  type: string
+                lastUpdatedTimestamp:
+                  type: string
+                migrationStartTimestamp:
+                  type: string
+                tags:
+                  type: array
+                  description: Add 'V2T-Migration' to trigger an NSX-V to NSX-T migration coordinator based native vMotion.
+                  items:
+                    type: string
+            summary:
+              type: object
+              properties:
+                state:
+                  type: string
+                resourceSummary:
+                  $ref: '#/components/schemas/mobilityGroupsDefaultResourceSummary'
+                progressSummary:
+                  $ref: '#/components/schemas/mobilityGroupProgressSummary'
+
+    mobilityGroupProgressSummary:
+      type: object
+      properties:
+        total:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+            bytesTransferred:
+              type: integer
+              format: int64
+        draft:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+        queued:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+        warning:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+        cancelled:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+        error:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+        transfer:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+            bytesTransferred:
+              type: integer
+              format: int64
+            progressCount:
+              type: integer
+            progress:
+              type: integer
+              format: int64
+            cancelledCount:
+              type: integer
+            cancelled:
+              type: integer
+              format: int64
+            completedCount:
+              type: integer
+            completed:
+              type: integer
+              format: int64
+            errorCount:
+              type: integer
+            error:
+              type: integer
+              format: int64
+            estimatedTimeToComplete:
+              type: integer
+              format: int64
+        waiting:
+          type: object
+          properties:
+            count:
+              type: integer
+        switchover:
+          type: object
+          properties:
+            count:
+              type: integer
+            totalBytes:
+              type: integer
+              format: int64
+            progressCount:
+              type: integer
+            progress:
+              type: integer
+              format: int64
+            completedCount:
+              type: integer
+            completed:
+              type: integer
+              format: int64
+            errorCount:
+              type: integer
+            error:
+              type: integer
+              format: int64
+            cancelledCount:
+              type: integer
+            cancelled:
+              type: integer
+              format: int64
+            estimatedTimeToComplete:
+              type: integer
+              format: int64
+
+    mobilityGroupConfigResponse:
+      type: object
+      properties:
+        item:
+          type: object
+          properties:
+            def:
+              type: object
+              properties:
+                id:
+                  type: string
+                config:
+                  $ref: '#/components/schemas/mobilityGroupDefaults'
+                tags:
+                  type: array
+                  description: Add 'V2T-Migration' to trigger an NSX-V to NSX-T migration coordinator based native vMotion.
+                  items:
+                    type: string
+        errors:
+          $ref: '#/components/schemas/errors'
+
+    mobilityGroupDefaults:
+      type: object
+      properties:
+        migrationType:
+          type: string
+        source:
+          $ref: '#/components/schemas/hcxSiteInfo'
+        destination:
+          $ref: '#/components/schemas/hcxSiteInfo'
+        servicemeshId:
+          type: string
+          description: The ID of the service mesh (optional)
+        transferParams:
+          $ref: '../../1.0/components/schemas/transferParams.yaml'
+        switchoverParams:
+          $ref: '../../1.0/components/schemas/switchoverParams.yaml'
+        placement:
+          type: array
+          items:
+            $ref: '../../1.0/components/schemas/placements.yaml'
+        storage:
+          type: object
+          properties:
+            defaultStorage:
+              $ref: '../../1.0/components/schemas/defaultStorage.yaml'
+            diskMappings:
+              type: array
+              items:
+                $ref: '../../1.0/components/schemas/diskMapping.yaml'
+        networkParams:
+          type: object
+          description: Only 'default mappings' are allowed to be specified in group level configurations.
+          properties:
+            defaultMappings:
+              type: array
+              items:
+                $ref: '../../1.0/components/schemas/networkParamsDefaultMappings.yaml'
+        guestCustomization:
+          $ref: '../../1.0/components/schemas/guestCustomization.yaml'
+
+    mobilityGroupMigrationsSummaryRequest:
+      type: object
+      properties:
+        filter:
+          type: object
+          properties:
+            migrationState:
+              type: array
+              items:
+                type: string
+            entityName:
+              type: string
+            migrationId:
+              type: array
+              items:
+                type: string
+            entityId:
+              type: array
+              items:
+                type: string
+            archiveScope:
+              type: string
+              enum:
+                - ARCHIVE_ONLY
+                - INCLUDE_ARCHIVE
+                - EXCLUDE_ARCHIVE
+              default: EXCLUDE_ARCHIVE
+        pageParameters:
+          $ref: '#/components/schemas/paginationRequest'
+
+    mobilityGroupMigrationsSummaryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              info:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  entity:
+                    $ref: '#/components/schemas/entity'
+                  migrationType:
+                    type: string
+              summary:
+                type: object
+                properties:
+                  resourceSummary:
+                    $ref: '#/components/schemas/mobilityGroupMigrationResourceSummary'
+                  progressSummary:
+                    $ref: '#/components/schemas/mobilityGroupMigrationProgressSummary'
+                  isArchived:
+                    type: boolean
+        pageParameters:
+          $ref: '#/components/schemas/paginationResponse'
+        errors:
+          $ref: '#/components/schemas/errors'
+
+    entity:
+      type: object
+      properties:
+        entityId:
+          type: string
+        entityType:
+          type: string
+        entityName:
+          type: string
+
+    mobilityGroupMigrationResourceSummary:
+      type: object
+      properties:
+        cpu:
+          type: integer
+        mem:
+          type: integer
+          format: int64
+        disk:
+          type: integer
+          format: int64
+
+    mobilityGroupMigrationProgressSummary:
+      type: object
+      properties:
+        creationTimestamp:
+          type: string
+        startTimestamp:
+          type: string
+        lastUpdatedTimestamp:
+          type: string
+        status:
+          type: string
+        message:
+          type: string
+        isRescheduleAllowed:
+          type: boolean
+        warning:
+          type: object
+          properties:
+            messages:
+              type: array
+              items:
+                type: string
+        error:
+          type: object
+          properties:
+            messages:
+              type: array
+              items:
+                type: string
+        cancelled:
+          type: object
+          properties:
+            totalBytes:
+              type: integer
+              format: int64
+        queued:
+          type: object
+          properties:
+            totalBytes:
+              type: integer
+              format: int64
+        total:
+          type: object
+          properties:
+            totalBytes:
+              type: integer
+              format: int64
+            bytesTransferred:
+              type: integer
+              format: int64
+        transfer:
+          type: object
+          properties:
+            totalBytes:
+              type: integer
+              format: int64
+            bytesTransferred:
+              type: integer
+              format: int64
+            lastUpdatedTimestamp:
+              type: string
+            startTimestamp:
+              type: string
+            scheduleStartTime:
+              type: integer
+              format: int64
+            scheduleExpiryTime:
+              type: integer
+              format: int64
+            estimatedTimeToComplete:
+              type: integer
+              format: int64
+        switchover:
+          type: object
+          properties:
+            totalBytes:
+              type: integer
+              format: int64
+            bytesTransferred:
+              type: integer
+              format: int64
+            lastUpdatedTimestamp:
+              type: string
+            startTimestamp:
+              type: string
+            scheduleStartTime:
+              type: integer
+              format: int64
+            scheduleExpiryTime:
+              type: integer
+              format: int64
+            estimatedTimeToComplete:
+              type: integer
+              format: int64
+
+    mobilityGroupMigrationDetailsResponse:
+      type: object
+      properties:
+        item:
+          type: object
+          properties:
+            def:
+              $ref: '#/components/schemas/mobilityGroupMigrationDefinition'
+            summary:
+              type: object
+              properties:
+                state:
+                  type: string
+                resourceSummary:
+                  $ref: '#/components/schemas/mobilityGroupMigrationResourceSummary'
+                progressSummary:
+                  $ref: '#/components/schemas/mobilityGroupMigrationProgressSummary'
+        errors:
+          type: array
+          items:
+            $ref: '../../../../api-common/swagger/1.0/components/schemas/error.yaml'
+
+    mobilityGroupMigrationDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        mobilityGroupId:
+          type: string
+        migrationType:
+          type: string
+        entity:
+          $ref: '#/components/schemas/entity'
+        source:
+          $ref: '#/components/schemas/hcxSiteInfo'
+        destination:
+          $ref: '#/components/schemas/hcxSiteInfo'
+        servicemeshId:
+          type: string
+          description: The ID of the service mesh (optional)
+        transferParams:
+          $ref: '../../1.0/components/schemas/transferParams.yaml'
+        switchoverParams:
+          $ref: '../../1.0/components/schemas/switchoverParams.yaml'
+        placement:
+          type: array
+          items:
+            $ref: '../../1.0/components/schemas/placements.yaml'
+        storage:
+          type: object
+          properties:
+            defaultStorage:
+              $ref: '../../1.0/components/schemas/defaultStorage.yaml'
+            diskMappings:
+              type: array
+              items:
+                $ref: '../../1.0/components/schemas/diskMapping.yaml'
+        networkParams:
+          $ref: '../../1.0/components/schemas/networkParams.yaml'
+        guestCustomization:
+          $ref: '../../1.0/components/schemas/guestCustomization.yaml'
+        pairingId:
+          type: string
+        migrationStartTimestamp:
+          type: string
+        lastUpdatedTimestamp:
+          type: string
+
+    paginationRequest:
+      $ref: '../../../../api-common/swagger/1.0/components/schemas/paginationRequest.yaml'
+
+    paginationResponse:
+      $ref: '../../../../api-common/swagger/1.0/components/schemas/paginationResponse.yaml'
+
+    errors:
+      type: array
+      items:
+        $ref: '../../../../api-common/swagger/1.0/components/schemas/error.yaml'
+
+    mobilityGroupMigrationsRetryRequest:
+      type: object
+      properties:
+        migrations:
+          type: array
+          items:
+            type: string
+
+    mobilityGroupMigrationsRetryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              migrationGroupId:
+                type: string
+              retryOfMigrationGroupId:
+                type: string
+              migrationWaveId:
+                type: string
+              migrationWaveName:
+                type: string
+              name:
+                type: string
+              migrations:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    migrationId:
+                      type: string
+                    retryOfMigrationId:
+                      type: string
+                    entityId:
+                      type: string
+                    errors:
+                      $ref: '#/components/schemas/errors'
+              errors:
+                $ref: '#/components/schemas/errors'
+        errors:
+          $ref: '#/components/schemas/errors'
+
+    mobilityGroupIntentV2:
+      type: object
+      properties:
+        migrationId:
+          type: string
+          description: It uniquely identifies the migration intent
+        retryOfMigrationId:
+          type: string
+          description: This parameter denotes the migration id for which the current migration is retry of.
+        migrationGroupId:
+          type: string
+          description: It uniquely identifies the group thats migration intent is member of
+        operationType:
+          type: string
+          description: This parameter is used to specify type of operation being performed, used in Mobility Groups API.
+        state:
+          type: string
+        migrationType:
+          type: string
+        tags:
+          type: array
+          description: Add 'V2T-Migration' to trigger an NSX-V to NSX-T migration coordinator based native vMotion.
+          items:
+            type: string
+        entity:
+          $ref: '#/components/schemas/entity'
+        source:
+          $ref: '#/components/schemas/siteDetails'
+        destination:
+          $ref: '#/components/schemas/siteDetails'
+        transferParams:
+          $ref: '#/components/schemas/transferParams'
+        switchoverParams:
+          $ref: '#/components/schemas/switchoverParams'
+        placement:
+          type: array
+          items:
+            $ref: '#/components/schemas/placements'
+        storage:
+          type: object
+          properties:
+            defaultStorage:
+              $ref: '#/components/schemas/defaultStorage'
+            diskMappings:
+              type: array
+              items:
+                $ref: '#/components/schemas/diskMapping'
+        networkParams:
+          $ref: '#/components/schemas/networkParams'
+        guestCustomization:
+          $ref: '#/components/schemas/guestCustomization'
+        servicemeshId:
+          type: string
+          description: This parameter is optional
+
+    mobilityGroupV2:
+      type: object
+      properties:
+        name:
+          type: string
+        migrationWaveId:
+          type: string
+        migrationWaveName:
+          type: string
+        migrationGroupId:
+          type: string
+        retryOfMigrationGroupId:
+          type: string
+          description: This represents migration group Id on which retry is performed.
+        state:
+          type: string
+        lastUpdated:
+          type: integer
+          format: int64
+        tags:
+          type: array
+          description: Add 'V2T-Migration' to trigger an NSX-V to NSX-T migration coordinator based native vMotion.
+          items:
+            type: string
+        groupDefaults:
+          $ref: '#/components/schemas/mobilityGroupDefaultsV2'
+        migrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/mobilityGroupIntentV2'
+
+    mobilityGroupDefaultsV2:
+      type: object
+      properties:
+        migrationType:
+          type: string
+        servicemeshId:
+          type: string
+          description: This parameter is optional
+        source:
+          $ref: '#/components/schemas/siteDetails'
+        destination:
+          $ref: '#/components/schemas/siteDetails'
+        transferParams:
+          $ref: '#/components/schemas/transferParams'
+        switchoverParams:
+          $ref: '#/components/schemas/switchoverParams'
+        placement:
+          type: array
+          items:
+            $ref: '#/components/schemas/placements'
+        storage:
+          type: object
+          properties:
+            defaultStorage:
+              $ref: '#/components/schemas/defaultStorage'
+            diskMappings:
+              type: array
+              items:
+                $ref: '#/components/schemas/diskMapping'
+        networkParams:
+          type: object
+          description: Only 'default mappings' are allowed to be specified in group level configurations.
+          properties:
+            defaultMappings:
+              type: array
+              items:
+                $ref: '../../1.0/components/schemas/networkParamsDefaultMappings.yaml'
+        guestCustomization:
+          $ref: '#/components/schemas/guestCustomization'
+
+    siteDetails:
+      $ref: '../../1.0/components/schemas/siteDetails.yaml'
+
+    transferParams:
+      $ref: '../../1.0/components/schemas/transferParams.yaml'
+
+    switchoverParams:
+      $ref: '../../1.0/components/schemas/switchoverParams.yaml'
+
+    placements:
+      $ref: '../../1.0/components/schemas/placements.yaml'
+
+    diskMapping:
+      $ref: '../../1.0/components/schemas/diskMapping.yaml'
+
+    networkParams:
+      $ref: '../../1.0/components/schemas/networkParams.yaml'
+
+    guestCustomization:
+      $ref: '../../1.0/components/schemas/guestCustomization.yaml'
+
+    defaultStorage:
+      $ref: '../../1.0/components/schemas/defaultStorage.yaml'
+
+
+security:
+  - x-hm-authorization: [ ]

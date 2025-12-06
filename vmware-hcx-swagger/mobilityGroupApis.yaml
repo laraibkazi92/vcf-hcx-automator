@@ -1,0 +1,565 @@
+openapi: 3.0.0
+info:
+  description: Mobility Groups APIs.
+  version: '1.0'
+  title: Mobility APIs.
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/mobility
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /groups:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: createMobilityGroups
+      summary: Create new mobility group
+      description: Create new mobility group
+      requestBody:
+        description: Mobility Group Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Mobility group name conflict.
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    put:
+      tags:
+        - Mobility Groups
+      operationId: updateMobilityGroups
+      summary: Update Mobility Group
+      description: Update Mobility Group
+      parameters:
+        - $ref: '#/components/parameters/isForceParam'
+      requestBody:
+        description: Mobility Group Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupRequest'
+      responses:
+        '202':
+          description: Accepted and updated Mobility Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  # We are using POST on '/groups/delete' instead of verb 'DELETE' as apache has limitation of sending request body with 'DELETE'.
+  /groups/delete:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: deleteMobilityGroup
+      summary: Delete Mobility Groups
+      description: This operation will delete specified mobility group, only if all the migrations in the group are in draft state.
+      requestBody:
+        description: Delete Mobility Group API Request Body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupsOperationsRequest'
+      responses:
+        '200':
+          description: Successfully deleted Mobility Group
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: If at least one of the migration is either in Running/Succeeded/Failed state, not allowed to delete the group.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '404':
+          description: Mobility group not found
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupQueryResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/query:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: queryMobilityGroups
+      summary: Query pre-created mobility groups.
+      description: Query pre-created mobility groups.
+      requestBody:
+        description: Query Mobility Groups Request Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupsQueryRequest'
+      responses:
+        '200':
+          description: Successfully retrived requested mobility groups.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupQueryResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Mobility group not found
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupQueryResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/start:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: startMobilityGroupsMigrations
+      summary: Start Mobility Groups Migrations
+      description: This API will start migrations of all VMs specified in the groups configuration.
+      requestBody:
+        description: Start Mobility Groups Migrations API Request Body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupsOperationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/cancel:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: cancelMobilityGroupsMigrations
+      summary: Cancel Mobility Group Migrations
+      description: This operation will stop all the running migrations specified in mobility groups configuration.
+      requestBody:
+        description: Cancel Mobility Group Migration API Request Body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupsOperationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/validate:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: validateMobilityGroups
+      summary: Validate Mobility Group
+      description: |
+        1) Request body can be full definition of Mobility Group or simply migrationGroupId(where mobility group is already pre-created).
+        2) Payload can be validated before or after Mobility Group is created.
+      requestBody:
+        description: Validate API request body can have full mobility group definitions or migrationGroupId.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/validateGroupRequestBody'
+      responses:
+        '200':
+          description: Mobility Group Validated Successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsOperationsResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+  /groups/{migrationGroupId}/prediction:
+    post:
+      tags:
+        - Mobility Groups
+      operationId: predictionForMigrationGroup
+      summary: Prediction For Mobility Group
+      description: |
+        1) Request body will be the Mobility Group Id.
+        2) Prediction will only happen for Mobility Groups that haven't started
+      parameters:
+        - name: migrationGroupId
+          in: path
+          description: Migration Group ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationsPredictionPostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/{migrationGroupId}/predictions:
+    get:
+      tags:
+        - Migration Intent
+      operationId: getPredictions
+      summary: Get Predictions for given predictionId
+      description: Get Predictions for given predictionId
+      parameters:
+        - name: migrationGroupId
+          in: path
+          description: Migration Group ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationPredictionGetResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /groups/{mobilityGroupId}/schedule:
+    post:
+      tags:
+        - Schedule api
+      operationId: scheduleMobilityGroupsMigrations
+      summary: Create/Update/Delete schedule for a mobility group/migration/s
+      description: Create/Update/Delete schedule for a mobility group/migration/s
+      parameters:
+        - explode: false
+          in: path
+          name: mobilityGroupId
+          required: true
+          schema:
+            type: string
+          style: simple
+        - explode: false
+          in: query
+          name: action
+          required: false
+          schema:
+            type: string
+          style: simple
+      requestBody:
+        description: MobilityGroup/Migrtaion Schedule object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/mobilityGroupScheduleRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/mobilityGroupsScheduleResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  /groups/{migrationGroupId}/schedule-info:
+    post:
+      tags:
+        -  Migration schedule api
+      operationId: queryScheduleInfo
+      summary: fetch transfer and switchover schedule
+      description: fetch transfer and switchover schedule
+      parameters:
+        - name: migrationGroupId
+          in: path
+          description: Migration Group ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: fetch transfer and switchover schedule request body
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/queryScheduleInfoRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/queryScheduleInfoResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+components:
+  schemas:
+    queryScheduleInfoRequest:
+      type: object
+      properties:
+        query:
+          type: object
+          properties:
+            migrations:
+              type: array
+              items:
+                type: string
+            includeGroupDefaults:
+              type: boolean
+        pageParameters:
+          $ref: '#/components/schemas/paginationRequest'
+    queryScheduleInfoResponse:
+      type: object
+      properties:
+        item:
+          type: object
+          properties:
+            migrations:
+              type: array
+              items:
+                $ref: '#/components/schemas/migrationSchedule'
+            groupDefaults:
+              $ref: './components/schemas/scheduleInfo.yaml'
+        pageParameters:
+          $ref: '#/components/schemas/paginationResponse'
+        errors:
+          type: array
+          items:
+            $ref: '../../../api-common/swagger/1.0/components/schemas/error.yaml'
+
+    migrationSchedule:
+      type: object
+      properties:
+        migrationId:
+          type: string
+        schedule:
+          $ref: './components/schemas/scheduleInfo.yaml'
+
+    # Externally defined models
+    mobilityGroupRequest:
+      $ref: './components/schemas/mobilityGroupsRequest.yaml'
+    mobilityGroupResponse:
+      $ref: './components/schemas/mobilityGroupsPostResponse.yaml'
+    mobilityGroupsQueryRequest:
+      $ref: './components/schemas/mobilityGroupsQueryRequest.yaml'
+    mobilityGroupQueryResponse:
+      $ref: './components/schemas/mobilityGroupsRequest.yaml'
+    mobilityGroupsOperationsRequest:
+      $ref: './components/schemas/mobilityGroupsOperationsRequest.yaml'
+    mobilityGroupsOperationsResponse:
+      $ref: './components/schemas/mobilityGroupsOperationsResponse.yaml'
+    migrationsPredictionPostResponse:
+      $ref: './components/schemas/migrationsPredictionPostResponse.yaml'
+    migrationPredictionGetResponse:
+      $ref: './components/schemas/migrationPredictionGetResponse.yaml'
+    groupsPredictionRequestBody:
+      $ref: './components/schemas/groupsPredictionRequestBody.yaml'
+    mobilityGroupScheduleRequest:
+      $ref: './components/schemas/mobilityGroupScheduleRequest.yaml'
+    mobilityGroupsScheduleResponse:
+      $ref: './components/schemas/mobilityGroupsScheduleResponse.yaml'
+
+    validateGroupRequestBody:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            anyOf:
+              - $ref: './components/schemas/mobilityGroupsRequest.yaml'
+              - $ref: './components/schemas/mobilityGroupsOperationsRequest.yaml'
+            additionalProperties: false
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+    paginationRequest:
+      $ref: '../../../../api-common/swagger/1.0/components/schemas/paginationRequest.yaml'
+    paginationResponse:
+      $ref: '../../../../api-common/swagger/1.0/components/schemas/paginationResponse.yaml'
+  # Query Parameters
+  parameters:
+    isForceParam:
+      name: force
+      in: query
+      description: is force parameter
+      required: false
+      schema:
+        type: string
+        default: "false"
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []
+
+tags:
+  - name: Mobility Groups
+    description: Mobility Groups APIs

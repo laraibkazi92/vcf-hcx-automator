@@ -1,0 +1,347 @@
+openapi: 3.0.0
+info:
+  description: Interconnecxt APIs.
+  version: '1.0'
+  title: Interconnecxt APIs.
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/interconnect
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /computeProfiles:
+    get:
+      tags:
+      - ComputeProfiles
+      operationId:  getComputeProfiles
+      summary: List compute profiles
+      description: List compute profiles
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfileListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+    post:
+      tags:
+      - ComputeProfiles
+      operationId: createComputeProfile
+      summary: Create new compute profile
+      description: Create new compute profile
+      requestBody:
+        description: Compute Profile object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/computeProfile'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /computeProfiles/query:
+    post:
+      tags:
+      - ComputeProfiles
+      operationId: queryComputeProfiles
+      summary: Query compute profiles
+      description: Query compute profiles
+      requestBody:
+        description: Filter object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/computeProfileFilter'
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfileListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  ### NEED TO review request and response with bhaskar
+  /computeProfiles/preview:
+    post:
+      tags:
+      - ComputeProfiles
+      operationId: previewComputeProfile
+      summary: Provides a preview of firewall rules for a compute profile not yet created.
+      description: Provides a preview of firewall rules for a compute profile not yet created. Tomorrow preview may provide other functionality/validations.
+      requestBody:
+        description: Preview Compute Profiles.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/computeProfile'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+
+  /computeProfiles/{computeProfileId}:
+    get:
+      tags:
+      - ComputeProfiles
+      summary: Gets a Compute Profile by ID.
+      description: Get a compute profile.
+      operationId: getComputeProfile
+      parameters:
+      - name: computeProfileId
+        in: path
+        description: Compute Profile ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfileGetResponse'
+        '404':
+          description: Not Found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    put:
+      tags:
+      - ComputeProfiles
+      summary: Update compute profile.
+      description: Modify a compute profile with config. The behavior is same as create operation.
+      operationId: modifyComputeProfile
+      parameters:
+      - name: computeProfileId
+        in: path
+        description: Compute Profile ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Compute Profile as request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/computeProfile'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+    delete:
+      tags:
+      - ComputeProfiles
+      summary: Delete a compute profile by id.
+      description: Delete a compute profile by id.
+      operationId: deleteComputeProfile
+      parameters:
+      - name: computeProfileId
+        in: path
+        description: Compute Profile ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /computeProfiles/{computeProfileId}/preview:
+    post:
+      tags:
+      - ComputeProfiles
+      summary: Preview a compute profile with config.
+      description: Provides a preview of firewall rules for an existing compute profile.
+      operationId: previewComputeProfileById
+      parameters:
+      - name: computeProfileId
+        in: path
+        description: Compute Profile ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Compute Profile as body.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/computeProfile'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/computeProfilePostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+components:
+  schemas:
+    #External defined models
+    computeProfile:
+      $ref: './components/schemas/computeProfile.yaml'
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+    computeProfileFilter:
+      $ref: './components/schemas/computeProfileFilter.yaml'
+    computeProfileGetResponse:
+      $ref: './components/schemas/computeProfileGetResponse.yaml'
+    computeProfileListResponse:
+      $ref: './components/schemas/computeProfileListResponse.yaml'
+    computeProfilePostResponse:
+      $ref: './components/schemas/computeProfilePostResponse.yaml'
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []
+
+tags:
+- name: ComputeProfiles
+  description: Interconnect Apis

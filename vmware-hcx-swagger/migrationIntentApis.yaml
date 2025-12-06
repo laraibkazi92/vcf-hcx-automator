@@ -1,0 +1,423 @@
+openapi: 3.0.0
+info:
+  description: Mobility APIs.
+  version: '1.0'
+  title: Mobility APIs.
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/mobility
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /migrations:
+    post:
+      deprecated: true
+      tags:
+        - Migration Intents
+      operationId: createMigrationIntents
+      summary: Create new migration intents
+      description: Create new migration intents
+      requestBody:
+        description: Migration Intent Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/migrationIntentsRequest'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+    put:
+      tags:
+        - Migration Intents
+      operationId: updateMigrationIntents
+      summary: Updates migration intents
+      description: Updates existing migration intents
+      requestBody:
+        description: Migration Intent Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/migrationIntentsRequest'
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/start:
+    post:
+      deprecated: true
+      tags:
+        - Migration Intents
+      operationId: startMigrations
+      summary: Start migrations
+      description: Start migrations with one or more existing intents or use specified intents
+      requestBody:
+        description: Migration Intent Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/startMigrationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/validate:
+    post:
+      tags:
+        - Migration Intents
+      operationId: validateMigrations
+      summary: Validate migrations
+      description: Validate migration with existing intents
+      requestBody:
+        description: Migration Intent Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/validateMigrationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/cancel:
+    post:
+      tags:
+        - Migration Intents
+      operationId: cancelMigrations
+      summary: Cancel one or more migrations
+      description: Cancel or more migrations
+      requestBody:
+        description: Migration Intent Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/cancelMigrationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/forceCancel:
+    post:
+      tags:
+        - Migration Intents
+      operationId: forceCancelMigrations
+      summary: Force cancel a migration.
+      description: Force cancel a migration.
+      requestBody:
+        description: Migration Force Cancel input Object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/forceCancelMigrationsRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/archive:
+    post:
+      tags:
+        - Migration Intents
+      operationId: archiveMigrations
+      summary: Archive one or more migrations.
+      description: Archive operation soft-deletes migration(s).
+      requestBody:
+        description: Array of objects containing migrationId and migrationGroupId.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/archiveMigrationRequest'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/delete:
+    post:
+      tags:
+        - Migration Intents
+      operationId: deleteMigrations
+      summary: Delete one or more archived migrations.
+      description: Delete operation will delete one or more archived migrations.
+      requestBody:
+        description: Request body can have either of 'items' (array of migrationId and migrationGroupId pair) or 'filter' (array of migration types)
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/deleteMigrationRequest'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteMigrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/deleteMigrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /migrations/retry:
+    post:
+      deprecated: true
+      tags:
+        - Migration Intents
+      operationId: retryMigrations
+      summary: Retry one or more failed and cancelled migration(s).
+      description: Retry one or more failed and cancelled migration(s).
+      requestBody:
+        description: Array of objects containing migrationId and migrationGroupId.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/retryMigrationRequest'
+      responses:
+        '200':
+          description: ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retryMigrationResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/retryMigrationResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+
+
+
+components:
+  schemas:
+    #Externally defined models
+    migrationIntentsRequest:
+      $ref: './components/schemas/migrationIntentsRequest.yaml'
+    migrationResponse:
+      $ref: './components/schemas/migrationIntentsPostResponse.yaml'
+    deleteMigrationResponse:
+      $ref: './components/schemas/deleteMigrationResponse.yaml'
+    startMigrationsRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            anyOf:
+              - $ref: './components/schemas/migrationIntentId.yaml'
+              - $ref: './components/schemas/migrationIntent.yaml'
+            additionalProperties: false
+    validateMigrationsRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            anyOf:
+              - $ref: './components/schemas/migrationIntentId.yaml'
+              - $ref: './components/schemas/migrationIntent.yaml'
+            additionalProperties: false
+    cancelMigrationsRequest:
+      $ref: './components/schemas/migrationIntentIds.yaml'
+    forceCancelMigrationsRequest:
+      $ref: './components/schemas/forceCancelRequest.yaml'
+    archiveMigrationRequest:
+      $ref: './components/schemas/archiveMigrationsRequest.yaml'
+    retryMigrationRequest:
+      $ref: './components/schemas/retryMigrationRequest.yaml'
+    retryMigrationResponse:
+      $ref: './components/schemas/retryMigrationResponse.yaml'
+    deleteMigrationRequest:
+      $ref: './components/schemas/deleteMigrationsRequest.yaml'
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []
+
+tags:
+  - name: Migration Intents
+    description: Mobility Migration Apis

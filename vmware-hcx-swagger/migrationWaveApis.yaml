@@ -1,0 +1,169 @@
+openapi: 3.0.0
+info:
+  description: Migration Wave APIs.
+  version: '1.0'
+  title: Migration Wave APIs.
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 Broadcom, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/v2
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /migration-wave/query:
+    post:
+      tags:
+        - Migration wave api
+      operationId: fetch migration wave mobility summary
+      summary: fetch migration wave mobility summary
+      description: fetch migration wave mobility summary
+      requestBody:
+        description: Migration Wave mobility Query Object
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/migrationWaveMobilityGroupsQueryRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/migrationWaveMobilityGroupsQueryResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+components:
+  schemas:
+    migrationWaveMobilityGroupsQueryRequest:
+      type: object
+      properties:
+        pageParameters:
+          $ref: '../../../../api-common/swagger/1.0/components/schemas/paginationRequest.yaml'
+          description: page parameters required to fetch page
+        filter:
+          type: object
+          properties:
+            migrationWaveId:
+              type: array
+              items:
+                type: string
+
+    migrationWaveMobilityGroupsQueryResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              info:
+                type: object
+                properties:
+                  migrationWaveId:
+                    type: string
+                  migrationWaveName:
+                    type: string
+                  lastUpdatedTimestamp:
+                    type: string
+                  migrationStartTimestamp:
+                    type: string
+              summary:
+                type: object
+                properties:
+                  state:
+                    type: string
+                  mobilityGroupStateSummary:
+                    $ref: '#/components/schemas/mobilityGroupStateSummary'
+                  migrationCountSummary:
+                    $ref: '#/components/schemas/mobilityGroupsDefaultCountSummary'
+                  resourceSummary:
+                    $ref: '#/components/schemas/mobilityGroupsDefaultResourceSummary'
+        pageParameters:
+          $ref: '#/components/schemas/pageParameters'
+        errors:
+          $ref: '#/components/schemas/errors'
+
+    mobilityGroupStateSummary:
+      type: object
+      properties:
+        totalMobilityGroups:
+          type: integer
+        totalInProgress:
+          type: integer
+        totalDraft:
+          type: integer
+        totalError:
+          type: integer
+        totalCancelled:
+          type: integer
+        totalCompleted:
+          type: integer
+
+    mobilityGroupsDefaultCountSummary:
+      type: object
+      properties:
+        totalVms:
+          type: integer
+        totalVmsDraft:
+          type: integer
+        totalVmsQueued:
+          type: integer
+        totalVmsWarning:
+          type: integer
+        totalVmsCancelled:
+          type: integer
+        totalVmsError:
+          type: integer
+        totalVmsInTransfer:
+          type: integer
+        totalVmsInSwitchover:
+          type: integer
+        totalVmsWaitingSwitchover:
+          type: integer
+        totalVmsCompleted:
+          type: integer
+
+    mobilityGroupsDefaultResourceSummary:
+      type: object
+      properties:
+        totalVms:
+          type: integer
+        totalCpus:
+          type: integer
+        totalMem:
+          type: integer
+          format: int64
+        totalDisk:
+          type: integer
+          format: int64
+
+    pageParameters:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/paginationResponse.yaml'
+
+    errors:
+      type: array
+      items:
+        $ref: '../../../api-common/swagger/1.0/components/schemas/error.yaml'
+
+security:
+  - x-hm-authorization: [ ]

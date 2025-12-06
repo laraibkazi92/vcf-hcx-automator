@@ -1,0 +1,116 @@
+openapi: 3.0.0
+info:
+  description: Configure Policy Routes for Source Routed Subnets
+  version: '1.0'
+  title: Configure Policy Routes for Source Routed Subnets
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/l2Extensions
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /policyRoutes:
+    get:
+      operationId: getPolicyRoutes 
+      summary: Fetch Currently configured Policy Routes from NSX-T
+      description: Fetch Currently configured Policy Routes from NSX-T
+      parameters:
+        - name: endpointId
+          in: query
+          description: endpointId of the destination of network extension
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/PolicyRoutes'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    put:
+      operationId:  putPolicyRoutes
+      summary: Configure Policy Routes on NSX-T
+      description: Configure Policy Routes on NSX-T
+      requestBody:
+        description: List of Subnets to allow & deny. Subnets should be in "IP/Prefix" format.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/policyRoutes'
+      responses:
+        '200':
+          $ref: '#/components/responses/PolicyRoutes'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+
+components:
+  schemas:
+    #External defined models
+    policyRoutes:
+      $ref: './components/schemas/policyRoutes.yaml'
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+
+  responses:
+    PolicyRoutes:
+      description: Policy Routes for PBF based NSXT PR
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/policyRoutes'
+    InternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponse'
+    ApplicationActionBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/applianceActionPostResponse'
+    ApplicationActionUnprocessibleEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/applianceActionPostResponse'
+    ApplicationActionSuccessResponse:
+      description: Accepted
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/applianceActionPostResponse'
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []

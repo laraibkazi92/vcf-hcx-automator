@@ -1,0 +1,963 @@
+openapi: 3.0.0
+info:
+  contact:
+    name: VMware
+  description: API query for HCX virtual machine migrations details.
+  license:
+    name: Copyright (c) 2020-2021 VMware, Inc. All rights reserved.
+  title: HCX query migrations API.
+  version: "1.0"
+security:
+ - x-hm-authorization: []
+servers:
+- url: https://{server}/hybridity/api
+  variables:
+    server:
+      default: hcx_mgr_server
+      description: HCX Manager server host name
+tags:
+- description: API to query virtual machine migrations details from HCX Manager.
+  name: Query migrations details
+paths:
+  /migrations:
+    post:
+      description: Returns the virtual machine migrations and their status details.
+      operationId: queryHcxMigrations
+      parameters:
+      - explode: true
+        in: query
+        name: action
+        required: true
+        description: Represents which action type to do on migration(s). This API is for querying migration(s) action.
+        schema:
+          enum:
+          - query
+          type: string
+        style: form
+      requestBody:
+        description: Query migrations filtering payload.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/queryMigrationsRequest'
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/queryMigrationsResponse'
+          description: Ok
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        400:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+          description: Bad Request
+        500:
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+          description: Internal Server Error
+      summary: Returns HCX migrations details.
+      tags:
+      - Query migrations details
+components:
+  schemas:
+    queryMigrationsRequest:
+      example:
+        '{filter={skipDrafts=true,createTimeEpoch=1583692200000},options={resultLevel="MOBILITYGROUP_ITEMS",compat=2.1}}'
+      type: object
+      properties:
+        filter:
+          type: object
+          description: This section is to specify filter parameters to query specified filter-matched migrations.
+          properties:
+            migrationGroupId:
+              type: array
+              description: Array of migration group identifiers.
+              items:
+                type: string
+            creationDateInterval:
+              type: number
+              description: Creation Date interval in milliseconds.
+            state:
+              type: array
+              description: Array of migration states.
+              items:
+                type: string
+            id:
+              type: array
+              description: Array of migration IDs.
+              items:
+                type: string 
+            migrationId:
+              type: array
+              description: Array of migration IDs.
+              items:
+                type: string 
+            entityId:
+              type: array
+              description: Array of migrating source virtual machine IDs.
+              items:
+                type: string
+            migrationType:
+              type: array
+              description: Array of migration types.
+              items:
+                type: string 
+            transferType:
+              type: array
+              description: Array of transfer types.
+              items:
+                type: string
+            source_endpointId:
+              type: array
+              description: Array of source endpoint IDs.
+              items:
+                type: string
+            destination_endpointId:
+              type: array
+              description: Array of destination endpoint IDs.
+              items:
+                type: string
+            destination_resourceId:
+              type: array
+              description: Array of destination resource IDs.
+              items:
+                type: string 
+            source_resourceId:
+              type: array
+              description: Array of source resource IDs.
+              items:
+                type: string
+            endpointId:
+              type: array
+              description: Array of either source or destination endpoint IDs.
+              items:
+                type: string
+            resourceId:
+              type: array
+              description: Array of either source or destination resource IDs.
+              items:
+                type: string 
+            userName:
+              type: array
+              description: Array of user names  that initiated the migrations.
+              items:
+                type: string
+            draftsOnly:
+              type: boolean
+              description: Returns draft state migrations. 
+            includeArchived:
+              type: boolean
+              description: Specifies whether to return the archieved migrations.
+            entity_id:
+              type: array
+              description: Array of migration source virtual machine IDs.
+              items:
+                type: string 
+            skipDrafts:
+              type: boolean
+              description: Specifies whether to skip the draft migrations.
+            createTimeEpoch:
+              type: number
+              description: Creation time of the migration is greater than given value.
+        options:
+          type: object
+          properties:
+            resultLevel:
+              type: string
+              description: Sets the level of detail at which to retrieve migrations.
+            compat:
+              type: number
+              description: Specify the compatibility version supported by the retrieved migration.
+        paging:
+          type: object
+          properties:
+            pageSize:
+              type: integer
+              description: Page size.
+            offset:
+              type: integer
+              description: Offset value from which the records page to be retrieved.
+            skipCount:
+              type: integer
+              description: Number of records to be skipped.
+    queryMigrationsResponse:
+      example:
+        '{data={items=[{initiator={location="20200429065629370-9dd1ee63-ca3f-44d6-9e66-11ef5516e533"},lastUpdated=1591564529000,version=2,username="Administrator@VSPHERE.LOCAL",
+        creationDate=1591563851000,pairingId="20200429065629370-9dd1ee63-ca3f-44d6-9e66-11ef5516e533|9456298e-4d5f-49f1-92d3-7101e68869df|20200429064422164-31f80b84-5d0b-41fb-b2e5-62a925f3e060|c879a579-fe68-4f8e-8aa4-c576aaede6ab",
+        id="a414eb40-4213-47c3-a3b1-7b37df218c1a",entityId="a414eb40-4213-47c3-a3b1-7b37df218c1a",entityType="migrationGroupItem",migrationType="RAV",
+        migrationId="a414eb40-4213-47c3-a3b1-7b37df218c1a",migrationGroupId="0f0bf6e1-4c15-4dc6-8d67-642b627b16af",transferGroupId="0f0bf6e1-4c15-4dc6-8d67-642b627b16af",
+        transferId="a414eb40-4213-47c3-a3b1-7b37df218c1a",state="MIGRATION_CANCELLED",source={endpointId="20200429065629370-9dd1ee63-ca3f-44d6-9e66-11ef5516e533",endpointType="VC",
+        endpointName="WDC-P2-HS3-HCX-NMB2-VM229.ENG.VMWARE.COM",resourceId="9456298e-4d5f-49f1-92d3-7101e68869df",computeResourceId="9456298e-4d5f-49f1-92d3-7101e68869df",resourceType="VC",
+        resourceName="wdc-p2-hs3-hcx-nmb2-vm687.eng.vmware.com"},destination={endpointId="20200429064422164-31f80b84-5d0b-41fb-b2e5-62a925f3e060",endpointType="VC",
+        endpointName="WDC-P2-HS3-HCX-NMB2-VM799.ENG.VMWARE.COM",resourceId="c879a579-fe68-4f8e-8aa4-c576aaede6ab",computeResourceId="c879a579-fe68-4f8e-8aa4-c576aaede6ab",resourceType="VC",
+        resourceName="wdc-p2-hs3-hcx-nmb2-vm674.eng.vmware.com"},entity={entityId="vm-259",entityType="VirtualMachine",entityName="murty_jun4_vm4"},
+        summary={guestFullName="Red Hat Enterprise Linux 6 (64-bit)",guestId="rhel6_64Guest",guestHostName="elftinycentos",memorySizeMB=256,numCpu=1,diskSize=1048576000,memorySize=268435456},
+        transferParams={transferType="vSphereReplication",creationDate="Sun Jun 07 21:04:11 GMT 2020",transferId="a414eb40-4213-47c3-a3b1-7b37df218c1a",
+        transferGroupId="0f0bf6e1-4c15-4dc6-8d67-642b627b16af",transferProfile=[{option="removeSnapshots",value=false},{option="removeISOs",value=false}],schedule={},workflowVersion=2},
+        switchoverParams={schedule={},options={retainMac=true,forcePowerOffVm=false,upgradeHardware=false,upgradeVMTools=false,isEvcDisabled=false,replicateSecurityTags=false,updateCustomAttributes=false},
+        switchoverProfile=[{option="retainMac",value=true},{option="forcePowerOffVm",value=false},
+        {option="upgradeHardware",value=false},{option="upgradeVMTools",value=false},{option="isEvcDisabled",value=false},{option="replicateSecurityTags",value=false},{option="updateCustomAttributes",value=false}]},
+        placement=[{id="domain-c7",name="RedwoodCluster",type="cluster"},{id="datacenter-2",name="RedwoodDc",type="dataCenter"},{id="group-v9",name="Discovered virtual machine",type="folder"}],
+        storage={defaultStorage={datastoreId="datastore-22",datastoreName="dc1nfs0-1",id="datastore-22",type="datastore",name="dc1nfs0-1",diskProvisionType="sameAsSource",
+        storageParams=[{option="StorageProfile",value="default",type="default",name="Datastore Default Storage Policy"}]}},networkParams={networkMappings=[{srcNetworkName="stretch3000",
+        srcNetworkDisplayName="stretch3000",srcNetworkValue="dvportgroup-59",srcNetworkHref="dvportgroup-59",destNetworkName="L2E_stretch3000-3000-9456298e",
+        destNetworkDisplayName="L2E_stretch3000-3000-9456298e",destNetworkValue="network-o61",destNetworkHref="network-o61",macAddress="00:50:56:8a:a0:1a",isprimaryNic=false,
+        srcNetworkId="dvportgroup-59",srcNetworkType="DistributedVirtualPortgroup",destNetworkId="network-o61",destNetworkType="OpaqueNetwork",connected=true}]},
+        progress={startTime=1591563851000,endTime=1591564529000,message="Migration Cancelled by user, rollback completed",draftState="RUNNING",isRescheduleAllowed=true,isCancelled=1,isDone=true,
+        didFail=true,total={count=1,value=1048576000,bytesTransferred=0},error={count=1,value=1048576000,message="Migration Cancelled."},transfer={count=1,value=0,startTime=1591563881000,
+        endTime=0,progressCount=0,progress=0,completedCount=0,completed=0,abortedCount=1,aborted=196608,canceledCount=1,canceled=196608,parkedCount=0,parked=0,errorCount=0,error=0},switchover={count=1,value=0,endTime=0,
+        progressCount=0,progress=0,completedCount=0,completed=0,abortedCount=1,aborted=1048576000,canceledCount=1,canceled=1048576000,parkedCount=0,parked=0,errorCount=0,error=0,waitingCount=0,waiting=0},parked={count=0,value=0},
+        aborted={count=1,value=196608},canceled={count=1,value=196608},state={statusType="MIGRATION_STATUS",rowType="MIGRATION_STATUS_ROW",status="MIGRATION_CANCELLED",errorsOccurred=true,message="Migration Cancelled by user,
+         rollback completed",errorMessage="Migration Cancelled.",lastUpdated="Sun Jun 07 21:15:29 GMT 2020",isRescheduleAllowed=true,isError=1,isTransferError=0,isTransfer=1,isSwitchoverError=0,
+         isTransferProgress=0,isTransferCompleted=1,isTransferParked=0,isSwitchoverCompleted=0,isSwitchoverProgress=0,isSwitchover=1,isParked=0,isSwitchoverParked=0,isTransferAborted=0,isTransferCanceled=0,
+         isSwitchoverAborted=1,isSwitchoverCanceled=1,isAborted=1,isCanceled=1,isWaitingForMaintWindow=0,isDone=true,isVMotionBaseSyncInProgress=false,isSwitchoverStarted=0},log=[{statusType="MIGRATION_STATUS",
+         rowType="MIGRATION_STATUS_ROW",status="MIGRATION_CANCELLED",errorsOccurred=true,message="Migration Cancelled by user, rollback completed",errorMessage="Migration Cancelled.",
+         lastUpdated="Sun Jun 07 21:15:29 GMT 2020"},{statusType="REPLICATION_TRANSFER_STATUS",rowType="TRANSFER_STATUS_ROW",status="TRANSFER_CANCELLED",errorsOccurred=false,
+         message="Migration Cancelled by user, rollback completed",lastUpdated="Sun Jun 07 21:15:29 GMT 2020",bytesTransferred=0,totalBytes=196608},{statusType="TRANSFER_STATUS",
+         rowType="TRANSFER_STATUS_ROW",status="TRANSFER_CANCELLED",errorsOccurred=false,message="Migration Cancelled by user, rollback completed",lastUpdated="Sun Jun 07 21:15:29 GMT 2020",
+         bytesTransferred=0,totalBytes=196608}]},isDeleted=false,isArchived=false,migrationTypeLabel="Replication-assisted vMotion"},]}}'
+      type: object
+      properties:
+        data:
+          type: object
+          properties:
+            items:
+              type: array
+              items:
+                type: object
+                properties:
+                  initiator:
+                    type: object
+                    properties:
+                      location:
+                        type: object
+                        description: Initiator location unique identifier.
+                  id:
+                    type: string
+                    description: Unique identifier of the migration.
+                  lastUpdated:
+                    type: number
+                    description: Last updated date of the migration.
+                  version:
+                    type: number
+                    description: Version.
+                  username:
+                    type: string
+                    description: User name.
+                  creationDate:
+                    type: number
+                    description: Creation date of the migration.
+                  pairingId:
+                    type: string
+                    description: Migration source and target pairing ID.
+                  entityId:
+                    type: string
+                    description: Source entity ID of the virtual machine which is under migration.
+                  entityType:
+                    type: string
+                    description: Source entity type.
+                  migrationType:
+                    type: string
+                    description: Migration type.
+                  migrationId:
+                    type: string
+                    description:  Migration unique identifier.
+                  migrationGroupId:
+                    type: string
+                    description: Migration group identifier.
+                  transferGroupId:
+                    type: string
+                    description: Transfer group ID.
+                  transferId:
+                    type: string
+                    description: Transfer ID.
+                  state:
+                    type: string
+                    description: State of the migration.
+                  source:
+                    type: object
+                    description: Source side end-point identifier details.
+                    properties:
+                      endpointId:
+                        type: string
+                        description: End-point unique identifier. 
+                      endpointType:
+                        type: string
+                        description: End-point type. 
+                      endpointName:
+                        type: string
+                        description: End-point name.
+                      resourceId:
+                        type: string
+                        description: End-point resource unique identifier.
+                      computeResourceId:
+                        type: string
+                        description: End-point compute resource unique identifier.
+                      resourceType:
+                        type: string
+                        description: End-point resource type.
+                      resourceName:
+                        type: string
+                        description: End-point resource name.   
+                  destination:
+                    type: object
+                    description: Destination side end-point identifier details.
+                    properties:
+                      endpointId:
+                        type: string
+                        description: End-point unique identifier. 
+                      endpointType:
+                        type: string
+                        description: End-point type. 
+                      endpointName:
+                        type: string
+                        description: End-point name.
+                      resourceId:
+                        type: string
+                        description: End-point resource unique identifier.
+                      computeResourceId:
+                        type: string
+                        description: End-point compute resource unique identifier.
+                      resourceType:
+                        type: string
+                        description: End-point resource type.
+                      resourceName:
+                        type: string
+                        description: End-point resource name.
+                  entity:
+                    type: object
+                    description: Virtual machine entity details.
+                    properties:
+                      entityId:
+                        type: string
+                        description: Entity ID.
+                      entityType:
+                        type: string
+                        description: Entity type.
+                      entityName:
+                        type: string
+                        description: Entity name.
+                  summary:
+                    type: object
+                    description: Virtual machine summary details.
+                    properties:
+                      guestFullName:
+                        type: string
+                        description: Virtual machine guest operating system full name.
+                      guestId:
+                        type: string
+                        description: Virtual machine guest operating system ID.
+                      guestHostName:
+                        type: string
+                        description: Virtual machine guest operating system host name.
+                      memorySizeMB:
+                        type: number
+                        description: Virtual machine memory size in MB.
+                      numCpu:
+                        type: integer
+                        description: Virtual machine number of CPU's
+                      diskSize:
+                        type: number
+                        description: Virtual machine disk size.
+                      memorySize:
+                        type: number
+                        description: Virtual machine memory size.
+                  transferParams:
+                    type: object
+                    description: Migration transfer parameters.
+                    properties:
+                      transferType:
+                        type: string
+                        description: Transfer type.
+                      creationDate:
+                        type: string
+                        description: Creation date.
+                      transferId:
+                        type: string
+                        description: Transfer ID.
+                      transferGroupId:
+                        type: string
+                        description: Transfer group ID.
+                      transferProfile:
+                        type: array
+                        description: Transfer profile.
+                        items:
+                          type: object
+                          properties:
+                            option:
+                              type: string
+                              description: Option type.
+                            value:
+                              type: boolean
+                              description: Option value.
+                      schedule:
+                        type: object
+                        description: Schedule details.
+                        properties:
+                          startTime:
+                            type: number
+                            description: Schedule start time.
+                          expiryTime:
+                            type: number
+                            description: Schedule expiry time.
+                      workflowVersion:
+                        type: number
+                        description: Workflow version.
+                  switchoverParams:
+                    type: object
+                    description: Migration switchover parameters
+                    properties:
+                      schedule:
+                        type: object
+                        description: Switchover schedule details.
+                        properties:
+                          startTime:
+                            type: number
+                            description: Schedule start time.
+                          expiryTime:
+                            type: number
+                            description: Schedule expiry time.
+                      options:
+                        type: object
+                        description: Options.
+                        properties:
+                          retainMac:
+                            type: boolean
+                            description: Whether to retain MAC address.
+                          forcePowerOffVm:
+                            type: boolean
+                            description: Whether to do force power off virtual machine.
+                          upgradeHardware:
+                            type: boolean
+                            description: Whether to upgrade virtual machine hardware version on target side migrated VM.
+                          upgradeVMTools:
+                            type: boolean
+                            description: Whether to upgrade VM tools on target side migrated VM.
+                          isEvcDisabled:
+                            type: boolean
+                            description: Whether to disable EVC.
+                          replicateSecurityTags:
+                           type: boolean
+                           description: Whether to replicate NSX security tags.
+                          updateCustomAttributes:
+                            type: boolean
+                            description: Whether to retain custom attributes for a VM during migration.
+                      switchoverProfile:
+                        type: array
+                        description: Switchover profile.
+                        items:
+                          type: object
+                          properties:
+                            option:
+                              type: string
+                              description: Option type.
+                            value:
+                              type: boolean
+                              description: Option value.
+                  placement:
+                    type: array
+                    description: Target side placement container details.
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          description: Placement container ID.
+                        name:
+                          type: string
+                          description: Placement container name.
+                        type:
+                          type: string
+                          description: Placement container type.
+                  storage:
+                    type: object
+                    description: Target storage details.
+                    properties:
+                      defaultStorage:
+                        type: object
+                        description: Default target storage details.
+                        properties:
+                          datastoreId:
+                            type: string
+                            description: Data store ID.
+                          datastoreName:
+                            type: string
+                            description: Data store name.
+                          id:
+                            type: string
+                            description: Target storage ID.
+                          type:
+                            type: string
+                            description: Target storage type.
+                          name:
+                            type: string
+                            description: Target storage name.
+                          diskProvisionType:
+                            type: string
+                            description: Disk provision type.
+                          storageParams:
+                            type: array
+                            description: Storage parameters.
+                            items:
+                              type: object
+                              properties:
+                                option:
+                                  type: string
+                                  description: Storage profile option.
+                                value:
+                                  type: string
+                                  description: Storage profile option value.
+                                type:
+                                  type: string
+                                  description: Storage profile option type.
+                                name:
+                                  type: string
+                                  description: Storage profile option name.
+                  networkParams:
+                    type: object
+                    description: Source to target network mapping details.
+                    properties:
+                      networkMappings:
+                        type: array
+                        description: Network mappings.
+                        items:
+                          type: object
+                          properties:
+                            srcNetworkName:
+                              type: string
+                              description: Source network name.
+                            srcNetworkDisplayName:
+                              type: string
+                              description: Source network display name.
+                            srcNetworkValue:
+                              type: string
+                              description: Source network value.
+                            srcNetworkHref:
+                              type: string
+                              description: Source network Href.
+                            destNetworkName:
+                              type: string
+                              description: Destination network name.
+                            destNetworkDisplayName:
+                              type: string
+                              description: Destination network display name.
+                            destNetworkValue:
+                              type: string
+                              description: Destination network value.
+                            destNetworkHref:
+                              type: string
+                              description: Destination network Href.
+                            macAddress:
+                              type: string
+                              description: Source VM MAC address.
+                            isprimaryNic:
+                              type: boolean
+                              description: Whether it is primary NIC.
+                            srcNetworkId:
+                              type: string
+                              description: Source network ID.
+                            srcNetworkType:
+                              type: string
+                              description: Source network type.
+                            destNetworkId:
+                              type: string
+                              description: Destination network ID.
+                            destNetworkType:
+                              type: string
+                              description: Destination network type.
+                            connected:
+                              type: boolean
+                              description: Is connected.
+                  progress:
+                    type: object
+                    description: Virtual machine migration progress details.
+                    properties:
+                      startTime:
+                        type: number
+                        description: Migration start time.
+                      endTime:
+                        type: number
+                        description: Migration end time.
+                      message:
+                        type: string
+                        description: Migration progress message.
+                      draftState:
+                        type: string
+                        description: Migration draft status.
+                      isRescheduleAllowed:
+                        type: boolean
+                        description: Indicates whether reschedule is allowed.
+                      isCancelled:
+                        type: integer
+                        description: Indicates whether the migration is cancelled.
+                      isDone:
+                        type: boolean
+                        description: Indicates whether the migration is done.
+                      didFail:
+                        type: boolean
+                        description: Indicates whether the migration failed.
+                      total:
+                        type: string
+                        description: Migration progress accumulated values.
+                        properties:
+                          count:
+                            type: integer
+                            description: Total number of migrations
+                          value:
+                            type: number
+                            description: Total bytes of migrations.
+                          bytesTransferred:
+                            type: integer
+                            description: Total bytes transferred.
+                      error:
+                        type: object
+                        description: Error details
+                        properties:
+                          count:
+                            type: integer
+                            description: Number of migrations with errors.
+                          value:
+                            type: number
+                            description: Total bytes of migrations.
+                          message:
+                            type: string
+                            description: Migration error message.
+                      transfer:
+                        type: object
+                        description: Migration transfer details.
+                        properties:
+                          count:
+                            type: integer
+                            description: Count of transfers.
+                          value:
+                            type: integer
+                            description: Migration transfer value.
+                          startTime:
+                            type: number
+                            description: Transfer start time.
+                          endTime:
+                            type: integer
+                            description: Transfer end time.
+                          progressCount:
+                            type: integer
+                            description: Transfer progress count.
+                          progress:
+                            type: integer
+                            description: Transfer progress.
+                          completedCount:
+                            type: integer
+                            description: Transfer completed count.
+                          completed:
+                            type: integer
+                            description: Transfer completed.
+                          abortedCount:
+                            type: integer
+                            description: Transfer cancelled count.
+                            deprecated: true
+                          canceledCount:
+                            type: integer
+                            description: Transfer cancelled count.
+                          aborted:
+                            type: number
+                            description: Transfer cancelled.
+                            deprecated: true
+                          canceled:
+                            type: number
+                            description: Transfer cancelled.
+                          parkedCount:
+                            type: integer
+                            description: Transfer parked count.
+                          parked:
+                            type: integer
+                            description: Transfer parked.
+                          errorCount:
+                            type: integer
+                            description: Transfer error count.
+                          error:
+                            type: integer
+                            description: Transfer error.
+                      switchover:
+                        type: object
+                        description: Migration switchover details.
+                        properties:
+                          count:
+                            type: integer
+                            description: Switchover count.
+                          value:
+                            type: integer
+                            description: Switchover value.
+                          endTime:
+                            type: integer
+                            description: Switchover end time.
+                          progressCount:
+                            type: integer
+                            description: Switchover progress count.
+                          progress:
+                            type: integer
+                            description: Switchover progress.
+                          completedCount:
+                            type: integer
+                            description: Switchover completed count.
+                          completed:
+                            type: integer
+                            description: Switchover completed.
+                          abortedCount:
+                            type: integer
+                            description: Switchover cancelled count.
+                            deprecated: true
+                          aborted:
+                            type: number
+                            description: Switchover cancelled.
+                            deprecated: true
+                          canceledCount:
+                            type: integer
+                            description: Switchover cancelled count.
+                          canceled:
+                            type: number
+                            description: Switchover cancelled.
+                          parkedCount:
+                            type: integer
+                            description: Switchover parked count.
+                          parked:
+                            type: integer
+                            description: Switchover parked.
+                          errorCount:
+                            type: integer
+                            description: Switchover error count.
+                          error:
+                            type: integer
+                            description: Swirchover error.
+                          waitingCount:
+                            type: integer
+                            description: Switchover waiting count.
+                          waiting:
+                            type: integer
+                            description: Switchover waiting.
+                      parked:
+                        type: object
+                        description: Migration parked details.
+                        properties:
+                          count:
+                            type: integer
+                            description: Migraiton parked count.
+                          value:
+                            type: integer
+                            description: Migration parked value.
+                      aborted:
+                        deprecated: true
+                        type: object
+                        description: Migration cancelled details.
+                        properties:
+                          count:
+                            type: integer
+                            description: Migration cancelled count.
+                          value:
+                            type: number
+                            description: Migration cancelled value.
+                      canceled:
+                        type: object
+                        description: Migration cancelled details.
+                        properties:
+                          count:
+                            type: integer
+                            description: Migration cancelled count.
+                          value:
+                            type: number
+                            description: Migration cancelled value.
+                      state:
+                        type: object
+                        description: Migration status information.
+                        properties:
+                          statusType:
+                            type: string
+                            description: Migration properties.
+                          rowType:
+                            type: string
+                            description: Migration row type.
+                          status:
+                            type: string
+                            description: Migration status.
+                          errorsOccurred:
+                            type: boolean
+                            description: Migration errors occurred.
+                          message:
+                            type: string
+                            description: Message.
+                          errorMessage:
+                            type: string
+                            description: Error message.
+                          lastUpdated:
+                            type: string
+                            description: Migration last updated.
+                          isRescheduleAllowed:
+                            type: boolean
+                            description: Whether reschedule is allowed.
+                          isError:
+                            type: integer
+                            description: Whether there is an error.
+                          isTransferError:
+                            type: integer
+                            description: Whether there is a transfer error.
+                          isTransfer:
+                            type: integer
+                            description: Whether there is a transfer.
+                          isSwitchoverError:
+                            type: integer
+                            description: Whether there is a switchover error.
+                          isTransferProgress:
+                            type: integer
+                            description: Whether there is a transfer progress.
+                          isTransferCompleted:
+                            type: integer
+                            description: Whether transfer completed.
+                          isTransferParked:
+                            type: integer
+                            description: Whether transfer parked.
+                          isSwitchoverCompleted:
+                            type: integer
+                            description: Whether switchover completed.
+                          isSwitchoverProgress:
+                            type: integer
+                            description: Whether there is switchover progress.
+                          isSwitchover:
+                            type: integer
+                            description: Whether there is a switchover.
+                          isParked:
+                            type: integer
+                            description: Whether migration parked.
+                          isSwitchoverParked:
+                            type: integer
+                            description: Whether switchover parked.
+                          isTransferAborted:
+                            type: integer
+                            description: Whether transfer cancelled.
+                            deprecated: true
+                          isSwitchoverAborted:
+                            type: integer
+                            description: Whether switchover cancelled.
+                            deprecated: true
+                          isAborted:
+                            type: integer
+                            deprecated: true
+                          isTransferCanceled:
+                            type: integer
+                            description: Whether transfer cancelled.
+                          isSwitchoverCanceled:
+                            type: integer
+                            description: Whether switchover cancelled.
+                          isCanceled:
+                            type: integer
+                            description: Whether migration cancelled.
+                          isWaitingForMaintWindow:
+                            type: integer
+                            description: Whether waiting for maintenance window.
+                          isDone:
+                            type: boolean
+                            description: Whether migration is done.
+                          isVMotionBaseSyncInProgress:
+                            type: boolean
+                            description: Whether vMotion base sync is in progress.
+                          isSwitchoverStarted:
+                            type: integer
+                            description: Whether switchover started.
+                      forceCleanupStatus:
+                        type: object
+                        description: Migration force cleanup status. This field will be present only if force cleanup has been initiated.
+                        properties:
+                          localStatus:
+                            type: object
+                            description: Force cleanup status of the local site
+                            properties:
+                              status:
+                                type: string
+                                description: Force cleanup status key. Values are FORCE_CLEANUP_QUEUED,FORCE_CLEANUP_INPROGRESS,FORCE_CLEANUP_COMPLETED,FORCE_CLEANUP_FAILED.
+                              message:
+                                type: string
+                                description: Force cleanup status message.
+                              isSource:
+                                type: boolean
+                                description: True if this status entry belongs to the migration source site
+                          remoteStatus:
+                            type: object
+                            description: Force cleanup status of the remote site
+                            properties:
+                              status:
+                                type: string
+                                description: Force cleanup status key. Values are FORCE_CLEANUP_QUEUED,FORCE_CLEANUP_INPROGRESS,FORCE_CLEANUP_COMPLETED,FORCE_CLEANUP_FAILED.
+                              message:
+                                type: string
+                                description: Force cleanup status message.
+                              isSource:
+                                type: boolean
+                                description: True if this status entry belongs to the migration source site
+                      log:
+                        type: array
+                        description: Migration running log information
+                        items:
+                          type: object
+                          properties:
+                            statusType:
+                              type: string
+                              description: Status type.
+                            rowType:
+                              type: string
+                              description: Row type.
+                            status:
+                              type: string
+                              description: Status.
+                            errorsOccurred:
+                              type: boolean
+                              description: Error occurred.
+                            message:
+                              type: string
+                              description: Message.
+                            errorMessage:
+                              type: string
+                              description: Error message.
+                            lastUpdated:
+                              type: string
+                              description: Last updated.
+                            bytesTransferred:
+                              type: integer
+                              description: Bytes transferred.
+                            totalBytes:
+                              type: number
+                              description: Total bytes.
+                  isDeleted:
+                    type: boolean
+                    description: Whether migration is deleted.
+                  isArchived:
+                    type: boolean
+                    description: Whether migration record is archived.
+                  migrationTypeLabel:
+                    type: string
+                    description: Migration type label.      
+    errorResponse:
+      properties:
+        errors:
+          items:
+            $ref: '#/components/schemas/error'
+          type: array
+      type: object
+    error:
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      type: object
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      in: header
+      name: x-hm-authorization
+      type: apiKey  

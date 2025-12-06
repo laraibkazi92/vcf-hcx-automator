@@ -1,0 +1,579 @@
+openapi: 3.0.0
+info:
+  description: Service Mesh APIs.
+  version: '1.0'
+  title: Service Mesh APIs
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/interconnect
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /serviceMesh:
+    get:
+      tags:
+      - serviceMesh
+      operationId: getAllServiceMesh
+      summary: List all service meshes
+      description: List all service meshes
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    post:
+      tags:
+      - serviceMesh
+      operationId: createServiceMesh
+      summary:  Create service mesh
+      description: Create service mesh
+      parameters:
+        - name: encryptionlessTunnelSwitchMode
+          in: query
+          description: Confirm Encryptionless tunnel
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        description: Service mesh as request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMesh'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /serviceMesh/{serviceMeshId}/resync:
+    post:
+      tags:
+      - serviceMesh
+      operationId:  resyncServiceMesh
+      summary:  Resync the service mesh with any changes in local or remote compute profiles
+      description: Resync the service mesh with any changes in local or remote compute profiles
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service Mesh ID
+        required: true
+        schema:
+          type: string
+      - name: method
+        in: query
+        description: method parameter
+        required: false
+        schema:
+          type: string
+          default: "legacy"
+      - name: encryptionlessTunnelSwitchMode
+        in: query
+        description: Confirm Encryptionless Tunnel
+        required: false
+        schema:
+          type: boolean
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /serviceMesh/{serviceMeshId}/generateDiff:
+    post:
+      tags:
+      - serviceMesh
+      summary: Generate diff for service mesh.
+      description: Generate diff service mesh.
+      operationId: generateDiffServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: ServiceMesh ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: ServiceMesh as request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMesh'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /serviceMesh/query:
+    post:
+      tags:
+      - serviceMesh
+      operationId:  getAllServiceMeshByFilter
+      summary:  List all service meshes
+      description: List all service meshes
+      requestBody:
+        description: Service Mesh filter object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMeshFilter'
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /serviceMesh/{serviceMeshId}:
+    get:
+      tags:
+      - serviceMesh
+      summary: Get a service mesh.
+      description: Get a service mesh.
+      operationId: getServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: ServiceMesh ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshGetResponse'
+        '404':
+          description: Not Found
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+    put:
+      tags:
+      - serviceMesh
+      summary: Update a service mesh.
+      description: Update a service mesh.
+      operationId: modifyServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: ServiceMesh ID
+        required: true
+        schema:
+          type: string
+      - name: encryptionlessTunnelSwitchMode
+        in: query
+        description: Confirm Encryptionless Tunnel
+        required: false
+        schema:
+          type: boolean
+      - name: method
+        in: query
+        description: method parameter
+        required: false
+        schema:
+          type: string
+          default: "legacy"
+      requestBody:
+        description: ServiceMesh as request body.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMesh'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+    delete:
+      tags:
+      - serviceMesh
+      summary: Delete a service mesh.
+      description: Delete a service mesh.
+      operationId: deleteServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service mesh ID
+        required: true
+        schema:
+          type: string
+      - name: force
+        in: query
+        description: force delete query param
+        required: false
+        schema:
+          type: string
+          default: false
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+
+  /serviceMesh/{serviceMeshId}/preview:
+    post:
+      tags:
+      - serviceMesh
+      summary: Preview a service mesh.
+      description: Preview a service mesh.
+      operationId: previewServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service Mesh ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+  /serviceMesh/{serviceMeshId}/diagnose:
+    post:
+      tags:
+      - serviceMesh
+      summary: Run diagnosis on a service mesh.
+      description: Run diagnosis on a service mesh.
+      operationId: diagnoseServiceMesh
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service Mesh ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Run ServiceMesh diagnosis request body.
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMeshDiagRequest'
+      responses:
+        '202':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshPostResponse'
+
+  /serviceMesh/{serviceMeshId}/diagnostics/query:
+    post:
+      tags:
+      - serviceMesh
+      summary: Get the list of diagnostics runs (summary) of a service mesh matching the filters.
+      description: Get the list of diagnostics runs (summary) of a service mesh matching the filters.
+      operationId: getDiagnosticsSummary
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service Mesh ID
+        required: true
+        schema:
+          type: string
+      requestBody:
+        description: Filter object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/serviceMeshDiagFilter'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshDiagResponseList'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /serviceMesh/{serviceMeshId}/diagnostics/{serviceMeshDiagId}:
+    get:
+      tags:
+      - serviceMesh
+      summary: Get the full details of diagnostics run of a service mesh.
+      description: Get the list of diagnostics run of a service mesh.
+      operationId: getDiagnosticsDetails
+      parameters:
+      - name: serviceMeshId
+        in: path
+        description: Service Mesh ID
+        required: true
+        schema:
+          type: string
+      - name: serviceMeshDiagId
+        in: path
+        description: Service Mesh diagnostics run ID
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/serviceMeshDiagResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '422':
+          description: Unprocessable Entity
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+components:
+  schemas:
+    #External defined models
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+    serviceMeshPostResponse:
+      $ref: './components/schemas/serviceMeshPostResponse.yaml'
+    serviceMeshPostResponseData:
+      $ref: './components/schemas/serviceMeshPostResponseData.yaml'
+    serviceMeshGetResponse:
+      $ref: './components/schemas/serviceMeshGetResponse.yaml'
+    serviceMeshListResponse:
+      $ref: './components/schemas/serviceMeshListResponse.yaml'
+    serviceMeshFilter:
+      $ref: './components/schemas/serviceMeshFilter.yaml'
+    serviceMeshDiagFilter:
+      $ref: './components/schemas/serviceMeshDiagFilter.yaml'
+    serviceMeshDiagResponse:
+      $ref: './components/schemas/serviceMeshDiagResponse.yaml'
+    serviceMeshDiagResponseList:
+      $ref: './components/schemas/serviceMeshDiagResponseList.yaml'
+    serviceMesh:
+      $ref: './components/schemas/serviceMesh.yaml'
+    serviceMeshDiagRequest:
+      $ref: './components/schemas/serviceMeshDiagRequest.yaml'
+
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []
+
+tags:
+- name: serviceMesh
+  description: ServiceMesh Apis

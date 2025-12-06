@@ -1,0 +1,64 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "vcf-hcx-automator"
+version = "0.1.0"
+description = "Backend for automating VCF VMware HCX workflows"
+authors = [
+    {name = "Laraib Kazi", email = "laraib@example.com"}
+]
+readme = "README.md"
+license = {text = "MIT"}
+requires-python = ">=3.13"
+dependencies = [
+    "litestar[standard]",
+    "msgspec",
+    "cyclopts",
+    "httpx>=0.24.0",
+    "pydantic>=2.0.0",
+    "pydantic-settings>=2.0.0",
+    "typer>=0.9.0",
+    "rich>=13.0.0",
+    "python-dotenv>=1.0.0",
+    "chardet>=5.0.0",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "black",
+    "ruff",
+    "mypy",
+]
+
+[project.scripts]
+vcf-hcx = "vcf_hcx_automator.cli.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/vcf_hcx_automator"]
+
+[tool.black]
+line-length = 88
+target-version = ['py313']
+
+[tool.ruff]
+line-length = 88
+target-version = "py313"
+select = ["E", "F", "W", "I", "B", "C4", "UP"]
+ignore = ["E501", "B008"]
+
+[tool.mypy]
+python_version = "3.13"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true

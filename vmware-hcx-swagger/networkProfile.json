@@ -1,0 +1,432 @@
+{
+   "consumes":[
+      "application/json"
+   ],
+   "definitions":{
+      "nls_1.0_asyncResponse":{
+         "properties":{
+            "data":{
+               "properties":{
+                  "jobId":{
+                     "maxLength":44,
+                     "minLength":44,
+                     "type":"string"
+                  },
+                  "objectId":{
+                     "maxLength":44,
+                     "minLength":44,
+                     "type":"string"
+                  }
+               },
+               "required":[
+                  "jobId"
+               ],
+               "type":"object"
+            },
+            "error":{
+               "type":"boolean"
+            },
+            "errorCode":{
+               "type":"integer"
+            },
+            "errorMessage":{
+               "type":"string"
+            }
+         },
+         "required":[
+            "error"
+         ],
+         "type":"object"
+      },
+      "nls_1.0_network":{
+         "properties":{
+            "allowTrunkInterfaces":{
+               "id":"allowTrunkInterfaces",
+               "type":"boolean"
+            },
+            "backings":{
+               "id":"backings",
+               "items":{
+                  "properties":{
+                     "backingId":{
+                        "id":"backingId",
+                        "type":"string"
+                     },
+                     "backingName":{
+                        "type":"string"
+                     },
+                     "type":{
+                        "type":"string"
+                     },
+                     "vCenterInstanceUuid":{
+                        "id":"vCenterInstanceUuid",
+                        "type":"string"
+                     }
+                  },
+                  "required":[
+                     "backingId",
+                     "vCenterInstanceUuid"
+                  ],
+                  "type":"object"
+               },
+               "type":"array"
+            },
+            "description":{
+               "id":"description",
+               "type":"string"
+            },
+            "enterprise":{
+               "id":"enterprise",
+               "type":"string",
+               "description":"Used in case of multi-tenant clouds to indicate the enterprise to which the network belongs. For vCenter, this should be set to DEFAULT."
+            },
+            "ipScopes":{
+               "id":"ipScopes",
+               "items":{
+                  "properties":{
+                     "dnsSuffix":{
+                        "id":"dnsSuffix",
+                        "type":"string"
+                     },
+                     "gateway":{
+                        "format":"ipv4",
+                        "id":"gateway",
+                        "type":"string"
+                     },
+                     "networkIpRanges":{
+                        "id":"networkIpRanges",
+                        "items":{
+                           "properties":{
+                              "endAddress":{
+                                 "format":"ipv4",
+                                 "id":"endAddress",
+                                 "type":"string"
+                              },
+                              "startAddress":{
+                                 "format":"ipv4",
+                                 "id":"startAddress",
+                                 "type":"string"
+                              }
+                           },
+                           "required":[
+                              "startAddress",
+                              "endAddress"
+                           ],
+                           "type":"object"
+                        },
+                        "minItems":1,
+                        "type":"array"
+                     },
+                     "prefixLength":{
+                        "id":"prefixLength",
+                        "maximum":32,
+                        "minimum":1,
+                        "type":"integer"
+                     },
+                     "primaryDns":{
+                        "id":"primaryDns",
+                        "type":"string"
+                     },
+                     "secondaryDns":{
+                        "id":"secondaryDns",
+                        "type":"string"
+                     }
+                  },
+                  "required":[
+                     "prefixLength"
+                  ],
+                  "type":"object"
+               },
+               "type":"array"
+            },
+            "jobDetails":{
+               "properties":{
+                  "error":{
+                     "type":"boolean"
+                  },
+                  "errorMessage":{
+                     "type":"string"
+                  },
+                  "lastJobId":{
+                     "type":"string"
+                  },
+                  "lastJobType":{
+                     "type":"string"
+                  }
+               },
+               "required":[
+                  "lastJobId",
+                  "lastJobType",
+                  "error"
+               ],
+               "type":"object"
+            },
+            "l3TenantManaged":{
+               "description":"True for Direct connect networks. False for Internet networks. Optional for others.",
+               "id":"l3TenantManaged",
+               "type":"boolean"
+            },
+            "name":{
+               "id":"name",
+               "type":"string"
+            },
+            "objectId":{
+               "id":"objectId",
+               "type":"string"
+            },
+            "ownedBySystem":{
+               "id":"ownedBySystem",
+               "type":"boolean",
+               "description":"True for Direct connect and Internet networks. False for other networks."
+            },
+            "mtu": {
+               "type": "integer",
+               "minimum": 68,
+               "maximum": 9000
+            },
+            "security" : {
+                "type": "object",
+                "properties": {
+                    "isSecure": {
+                        "type": "boolean",
+                        "id": "isSecure"
+                    },
+                    "modifiable": {
+                        "type": "boolean",
+                        "id": "modifiable"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "id": "reason"
+                    }
+                }
+            },
+            "state":{
+               "enum":[
+                  "NOT_REALIZED",
+                  "CREATE_IN_PROGRESS",
+                  "IN_PROGRESS",
+                  "REALIZED",
+                  "DELETE_IN_PROGRESS",
+                  "ERROR"
+               ],
+               "type":"string"
+            },
+            "tags":{
+               "id":"tags",
+               "items":{
+                  "maxLength":36,
+                  "minLength":1,
+                  "type":"string"
+               },
+               "maxItems":5,
+               "type":"array",
+               "uniqueItems":true
+            }
+         },
+         "required":[
+            "name"
+         ],
+         "type":"object"
+      },
+      "nls_1.0_networks":{
+         "items":{
+            "$ref":"#/definitions/nls_1.0_network",
+            "type":"object"
+         },
+         "type":"array"
+      }
+   },
+   "info":{
+      "contact":{
+         "name":"VMware"
+      },
+      "license":{
+         "name":"Copyright (c) 2020-2021 VMware, Inc. All rights reserved."
+      },
+      "title":"Network Profile APIs",
+      "version":"1.0"
+   },
+   "paths":{
+      "/admin/hybridity/api/networks":{
+         "post":{
+            "description":"Create new Network Profile",
+            "parameters":[
+               {
+                  "in":"body",
+                  "name":"nls_1.0_network",
+                  "required":true,
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_network"
+                  }
+               },
+               {
+                  "in":"query",
+                  "name":"async",
+                  "required":false,
+                  "type":"boolean"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Accepted",
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_asyncResponse"
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "403":{
+                  "description":"Forbidden"
+               }
+            },
+            "summary":"Create new Network Profile"
+         }
+      },
+      "/hybridity/api/networks": {
+         "get": {
+            "parameters": [
+              {
+                "description": "UUID of (remote) appliance. Useful when sending requests from one appliance to another appliance.",
+                "in": "query",
+                "name": "endpointId",
+                "required": false,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Accepted",
+                "schema": {
+                  "$ref": "#/definitions/nls_1.0_networks"
+                }
+              },
+              "401": {
+                "description": "Unauthorized"
+              },
+              "403": {
+                "description": "Forbidden"
+              }
+            },
+            "summary": "List all Network Profiles"
+         }
+      },
+      "/hybridity/api/networks/{networkId}":{
+         "delete":{
+            "parameters":[
+               {
+                  "in":"path",
+                  "name":"networkId",
+                  "required":true,
+                  "type":"string"
+               },
+               {
+                  "in":"query",
+                  "name":"async",
+                  "required":false,
+                  "type":"boolean"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Accepted",
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_asyncResponse"
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "403":{
+                  "description":"Forbidden"
+               }
+            },
+            "summary":"Delete Network Profile"
+         },
+         "get":{
+            "parameters":[
+               {
+                  "in":"path",
+                  "name":"networkId",
+                  "required":true,
+                  "type":"string"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Accepted",
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_network"
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "403":{
+                  "description":"Forbidden"
+               }
+            },
+            "summary":"Get a Network Profile by ID"
+         },
+         "put":{
+            "parameters":[
+               {
+                  "in":"body",
+                  "name":"nls_1.0_network",
+                  "required":true,
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_network"
+                  }
+               },
+               {
+                  "in":"path",
+                  "name":"networkId",
+                  "required":true,
+                  "type":"string"
+               },
+               {
+                  "in":"query",
+                  "name":"async",
+                  "required":false,
+                  "type":"boolean"
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"Accepted",
+                  "schema":{
+                     "$ref":"#/definitions/nls_1.0_asyncResponse"
+                  }
+               },
+               "401":{
+                  "description":"Unauthorized"
+               },
+               "403":{
+                  "description":"Forbidden"
+               }
+            },
+            "summary":"Update Network Profile"
+         }
+      }
+   },
+   "produces":[
+      "application/json"
+   ],
+   "security":[
+      {
+         "x-hm-authorization":[
+
+         ]
+      }
+   ],
+   "securityDefinitions":{
+      "x-hm-authorization":{
+         "description":"Obtained from /hybridity/api/session",
+         "in":"header",
+         "name":"x-hm-authorization",
+         "type":"apiKey"
+      }
+   },
+   "swagger":"2.0"
+}

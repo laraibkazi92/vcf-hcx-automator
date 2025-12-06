@@ -1,0 +1,146 @@
+openapi: 3.0.0
+info:
+  description: Interconnect Tasks APIs.
+  version: '1.0'
+  title: Interconnect Tasks APIs.
+  contact:
+    name: VMware
+  license:
+    name: 'Copyright (c) 2020-2021 VMware, Inc. All rights reserved.'
+servers:
+  - url: https://{server}/hybridity/api/interconnect
+    variables:
+      server:
+        description: server host name
+        default: api.example.com
+
+paths:
+  /tasks:
+    get:
+      tags:
+      - Tasks
+      operationId:  getAllInterconnectTasks
+      summary: Get all interconnect tasks
+      description: Get all interconnect tasks
+      parameters:
+        - name: offset
+          in: query
+          description: offset query parameter
+          required: false
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          description: pageSize query parameter
+          required: false
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasksListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /tasks/{interconnectTaskId}:
+    get:
+      tags:
+      - Tasks
+      operationId: getInterconnectTask
+      summary: Get a interconnect task by id.
+      description: Get a interconnect task by id.
+      parameters:
+        - name: interconnectTaskId
+          in: path
+          description: task id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/taskResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+
+  /tasks/query:
+    post:
+      tags:
+        - Tasks
+      operationId: getInterconnectTasksByFilter
+      summary: query interconnect tasks.
+      description: query interconnect tasks.
+      requestBody:
+        description: Filter object.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/taskFilter'
+      responses:
+        '200':
+          description: Accepted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/tasksListResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponse'
+components:
+  schemas:
+    #External defined models
+    errorResponse:
+      $ref: '../../../api-common/swagger/1.0/components/schemas/errorResponse.yaml'
+    taskResponse:
+      $ref: './components/schemas/taskResponse.yaml'
+    tasksListResponse:
+      $ref: './components/schemas/tasksListResponse.yaml'
+    taskFilter:
+      $ref: './components/schemas/taskFilter.yaml'
+
+
+  securitySchemes:
+    x-hm-authorization:
+      description: Obtained from /hybridity/api/session
+      type: apiKey
+      name: x-hm-authorization
+      in: header
+
+security:
+  - x-hm-authorization: []
+
+tags:
+- name: Tasks
+  description: Interconnect Tasks Apis

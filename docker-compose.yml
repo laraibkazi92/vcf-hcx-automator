@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  convex:
+    image: getconvex/convex:latest
+    container_name: vcf-hcx-convex
+    ports:
+      - "3210:3210"
+      - "3211:3211"
+    environment:
+      - CONVEX_DEPLOYMENT_NAME=vcf-hcx-automator
+      - CONVEX_LOG_LEVEL=info
+    volumes:
+      - convex_data:/convex/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3210/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Optional: Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: vcf-hcx-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  convex_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: vcf-hcx-network
